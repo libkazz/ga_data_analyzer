@@ -23,6 +23,10 @@ class GaDataAnalyzer
     import!(FileReader.open(file).lines)
   end
 
+  def title
+    File.basename(file)
+  end
+
   def lines
     Line
   end

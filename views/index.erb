@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>HTML 5 complete</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <!--[if IE]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link rel="stylesheet" href="/style.css">
+    <script src="http://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+    <script>
+$(function () {
+    // Make monochrome colors and set them as default for all pies
+    Highcharts.getOptions().plotOptions.pie.colors = (function () {
+        var colors = [],
+            base = Highcharts.getOptions().colors[0],
+            i;
+
+        for (i = 0; i < 73; i += 1) {
+            // Start out with a darkened base color (negative brighten), and end
+            // up with a much brighter color
+            colors.push(Highcharts.Color(base).brighten((i - 3) / 10).get());
+        }
+        return colors;
+    }());
+
+    // Build the chart
+    Highcharts.chart('container', {
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false,
+            type: 'pie'
+        },
+        title: {
+            text: '<%= @ga.title %>'
+        },
+        subtitle: {
+          text: 'Filter: <%= @where.inspect %>, Group: <%= @group %>',
+        },
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+        },
+        plotOptions: {
+            pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
+                dataLabels: {
+                    enabled: true,
+                    format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                    style: {
+                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                    }
+                }
+            }
+        },
+        series: [{
+            name: '<%= @group %>',
+            data: [
+							<% @diffs.each do |d| %>
+                { name: '<%= d.key %>', y: <%= d.delta %> },
+							<% end %>
+            ]
+        }]
+    });
+
+    $('#nav').on('change', function() {
+      $('form').submit();
+    });
+});
+    </script>
+  </head>
+  <body>
+    <div id="nav" class="rounded">
+      <form action="/">
+        <ul>
+          <% GaDataAnalyzer::LineParser::PAGE_TYPES.each do |page_type| %>
+            <li><input type="checkbox" name="where[page_type][]" value="<%= page_type %>" <%= @where&.fetch('page_type', []).include?(page_type) ? 'checked' : '' %>>&nbsp;&nbsp;<%= page_type %></li>
+          <% end %>
+        </ul>
+        <ul>
+          <% %w(sub_category page_type path).each do |group| %>
+            <li><input type="radio" name="group" value="<%= group %>" <%= @group == group ? 'checked' : '' %>>&nbsp;&nbsp;<%= group %></li>
+          <% end %>
+        </ul>
+      </form>
+    </div>
+    <div id="container"></div>
+    <div id="table">
+      <table class='table table-inverse'>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th><%= @group %></th>
+            <th><%= @ga.first_duration.name %></th>
+            <th><%= @ga.second_duration.name %></th>
+            <th>Diff</th>
+            <th>Div(%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @diffs.each.with_index(1) do |d, index| %>
+            <tr>
+              <td><%= index %></td>
+              <td><%= d.key %></td>
+              <td><%= d.first %></td>
+              <td><%= d.second %></td>
+              <td><%= d.delta %></td>
+              <td><%= d.div_p %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>

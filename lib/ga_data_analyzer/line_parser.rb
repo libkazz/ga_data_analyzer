@@ -1,5 +1,23 @@
 class GaDataAnalyzer
   class LineParser
+    PAGE_TYPES = %w(
+      top
+      page
+      function
+      pros
+      area
+      example
+      prices
+      form
+      expense
+      content
+      diy
+      product
+      products
+      category_top
+      null
+    )
+
     SUB_CATEGORIES = %w(
       ac-cleaning
       ac-office-work
