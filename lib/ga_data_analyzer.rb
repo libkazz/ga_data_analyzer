@@ -14,7 +14,7 @@ class GaDataAnalyzer
   attr_reader :file
 
   def self.start(file)
-    @instance ||= new(file)
+    new(file)
   end
 
   def initialize(file)
