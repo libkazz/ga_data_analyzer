@@ -78,7 +78,7 @@ $(function () {
       <form action="/">
         <ul>
           <% GaDataAnalyzer::LineParser::PAGE_TYPES.each do |page_type| %>
-            <li><input type="checkbox" name="where[page_type][]" value="<%= page_type %>" <%= @where&.fetch('page_type', []).include?(page_type) ? 'checked' : '' %>>&nbsp;&nbsp;<%= page_type %></li>
+            <li><input type="checkbox" name="where[page_type][]" value="<%= page_type %>" <%= @where&.fetch('page_type', [])&.include?(page_type) ? 'checked' : '' %>>&nbsp&nbsp;<%= page_type %></li>
           <% end %>
         </ul>
         <ul>
