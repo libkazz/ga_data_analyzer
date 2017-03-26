@@ -11,9 +11,11 @@ file = $ARGV[0]
 #   http://localhost:4567/?group=path3&where[page_type]=area&where[sub_category]=kitchen&where[sub_category]=bathroom
 #
 
+GaDataAnalyzer.start(file)
+
 get '/' do
 	valid_sort_key = %w(key first second delta div)
-  @ga = GaDataAnalyzer.start(file)
+  @ga = GaDataAnalyzer.new(file)
   @where = params[:where]
   @group = params[:group] || 'sub_category'
 	@sort = 'delta'

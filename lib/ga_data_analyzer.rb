@@ -1,4 +1,5 @@
 require 'active_record'
+require 'fileutils'
 require 'byebug'
 require 'csv'
 require_relative 'ga_data_analyzer/diff'
@@ -9,18 +10,23 @@ require_relative 'ga_data_analyzer/line'
 require_relative 'ga_data_analyzer/line_parser'
 
 class GaDataAnalyzer
-  include Importer
+  PATH = './tmp/ga_data_analyzer.sqlite3'
 
   attr_reader :file
 
   def self.start(file)
-    new(file)
+    FileUtils.rm(PATH) if File.file?(PATH)
+    ActiveRecord::Base.establish_connection(
+      adapter: 'sqlite3',
+      pool: 10,
+      database: PATH
+    )
+
+    Importer.import!(FileReader.open(file).lines)
   end
 
   def initialize(file)
     @file = file
-
-    import!(FileReader.open(file).lines)
   end
 
   def title
@@ -46,14 +52,15 @@ class GaDataAnalyzer
   private
 
   def duration_names
-    @duration_names ||= lines.select('DISTINCT duration').pluck(:duration)
+    @duration_names ||= Line.select('DISTINCT duration').pluck(:duration)
   end
 end
 
 if __FILE__ == $PROGRAM_NAME
   file = ARGV[0]
 
-  ga = GaDataAnalyzer.start(file)
+  GaDataAnalyzer.start(file)
+  ga = GaDataAnalyzer.new(file)
 
   p ga.lines.group(:duration, :page_type).sum(:session)
   p ga.first_duration.name

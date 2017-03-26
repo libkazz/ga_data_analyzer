@@ -2,7 +2,7 @@ class GaDataAnalyzer
   class Diff
     class << self
       def compare(first, last)
-        first.keys.map { |key| GaDataAnalyzer::Diff.new(key, first[key], last[key]) }
+        first.keys.map { |key| new(key, first[key], last[key]) }
       end
     end
 
