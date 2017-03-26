@@ -12,9 +12,11 @@ class GaDataAnalyzer
       expense
       content
       diy
+      questions
       product
       products
       category_top
+      tags
       null
     )
 
@@ -143,7 +145,7 @@ class GaDataAnalyzer
       case path
       when '/'
         :top
-      when '/about', '/terms', '/surety'
+      when '/about', '/terms', '/surety', '/privacy'
         :page
       when '/surety/'  # not exist path
         :page
@@ -159,6 +161,8 @@ class GaDataAnalyzer
         :example
       when %r{/prices}
         :prices
+      when %r{/questions}
+        :quetions
       when %r{/estimate_requests|/inquiry}
         :form
       when %r{/contents/}
@@ -178,6 +182,8 @@ class GaDataAnalyzer
         :product
       when %r{/products}
         :products
+      when %r{/tags}
+        :tags
       when *(SUB_CATEGORIES.map { |slug| "/#{slug}" })
         :category_top
       when %r{^/https?://reform-market.com}
